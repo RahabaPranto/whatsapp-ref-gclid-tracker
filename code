@@ -1,0 +1,43 @@
+"<script>
+(function () {
+  function updateWhatsAppLinks() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var gclid = params.get('gclid') || localStorage.getItem('gclid');
+
+      if (!gclid) return;
+
+      localStorage.setItem('gclid', gclid);
+
+      var ref = localStorage.getItem('lead_ref') ||
+        Math.random().toString(36).slice(2, 7).toUpperCase();
+
+      localStorage.setItem('lead_ref', ref);
+
+      var suffix = ' (Ref: ' + ref + ')';
+
+      document.querySelectorAll('a[href]').forEach(function (link) {
+        var url = new URL(link.href, document.baseURI);
+
+        if (url.hostname !== 'wa.me') return;
+
+        var message = url.searchParams.get('text') ||
+          'Hi, I would like a quote.';
+
+        if (message.indexOf(suffix) === -1) {
+          url.searchParams.set('text', message + suffix);
+          link.href = url.toString();
+        }
+      });
+    } catch (error) {
+      // Keep contact links usable if browser storage is unavailable.
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateWhatsAppLinks);
+  } else {
+    updateWhatsAppLinks();
+  }
+})();
+</script>"
